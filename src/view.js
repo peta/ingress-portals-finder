@@ -26,7 +26,6 @@ window.addEventListener('message', function(event) {
   } else if( event.data ) {
     if( event.data.bounds ) {
       updateBounds( event.data );
-
     } else {
       view( event.data );
     }
@@ -40,6 +39,7 @@ function updateBounds( data ) {
   }
   if( data.zoom ) {
     localStorage['zoom'] = data.zoom;
+	  $('#myzoom').val(data.zoom);
   }
   d = data.bounds;
   if( d && d.length == 2 ) {
@@ -211,7 +211,7 @@ function filter( results ) {
   } else {
     n.sort();
   }
-  var v = $('#mykey').val();
+  var v = $('#mykeywords').val();
   if( /\S/.test(v) ) {
     krxp = new RegExp( '(' +v.replace(/^\s+|\s+$/g,'').toLowerCase().replace(/\s*,\s*/g, '|') +')', 'ig' );
   }
@@ -544,6 +544,8 @@ $(document).ready(function(){
     }
 
     var bounds = ($('#mymin').val() +',' +$('#mymax').val()).replace(/\s+/g, '');
+	// append zoom level
+	bounds += '@'+(~~($('#myzoom').val()) || 16);
     var m = bounds.split(/\s*,\s*/);
     if( Math.abs(parseFloat(m[0]) - parseFloat(m[2])) > 1.0
       || Math.abs(parseFloat(m[1])-parseFloat(m[3])) > 1.2 ) {
