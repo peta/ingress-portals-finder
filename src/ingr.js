@@ -3,7 +3,7 @@ var ck = document.cookie.match(/(^|;)\s*csrftoken=([^\s;]+)/i)
   , api = "//www.ingress.com/rpc/dashboard.getThinnedEntitiesV3"
   , qk = '0_2_6'
   , param = {
-    "zoom" : 12,
+    "zoom" : 16,
     "boundsParamsList" : [],
     "method": "dashboard.getThinnedEntitiesV3"
   };
@@ -12,8 +12,9 @@ var port = chrome.extension.connect({name: "ingress-air"})
   , ready = true;
 
 port.onMessage.addListener(function(bounds){
+	console.log('[Fix] ingr.js message received', bounds);
   ready = true;
-  if( /-?[\.\d]+,-?[\.\d]+,-?[\.\d]+,-?[\.\d]+/.test( bounds ) ) {
+  if( /-?[\.\d]+,-?[\.\d]+,-?[\.\d]+,-?[\.\d]+@\d+/.test( bounds ) ) {
     if( !token ) {
       var ck = document.cookie.match(/(^|;)\s*csrftoken=([^\s;]+)/i);
       token = ck && ck[2] || '';
@@ -143,11 +144,15 @@ function ingr(bounds) {
   xhr.open("POST", api, true);
   xhr.setRequestHeader("X-CSRFToken", token);
 
-  // Overwrite bounds obj
-  var tileParamObjs =
-  param.boundsParamsList =
-  	IPF.MapTools.boundsToTileObjs(12, bounds.split(','));  
-  console.log('[Fix] Generated tile objects', tileParamObjs);
+  // Build tile param objects used to query data
+  
+  // Chop off zoom level and prepare boundary coords
+  var tmp = bounds.split('@'),
+      tmpBounds = tmp[0].split(','),
+      zoom = ~~(tmp[1]);
+  // Generate tile param objects
+  param.boundsParamsList = IPF.MapTools.boundsToTileObjs(zoom || 16, tmpBounds);  
+  console.log('[Fix] Generated tile objects', param.boundsParamsList);
 
   xhr.withCredentials = true;
   xhr.send( JSON.stringify(param) );
