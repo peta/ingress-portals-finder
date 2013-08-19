@@ -4,14 +4,14 @@ window.oncontextmenu = function(){return false};
 
 function _ob(id){return document.getElementById(id);}
 
-function initialize() {
+function initialize(zoom) {
    if( !window.google || !window.google.maps ) {
      return parent.postMessage('map-failed', target);
    }
    try{
      var mapOptions = {
        center: new google.maps.LatLng(22.528176,113.928448),
-       zoom: 12,
+       zoom: zoom || 16,
        mapTypeId: google.maps.MapTypeId.HYBRID
      };
      ingr = new google.maps.Map(_ob("mindon_ingr_map"),
@@ -71,7 +71,14 @@ window.addEventListener('message', function(event) {
       , ne = bounds.getNorthEast()
       , center = ingr.getCenter();
 
-    event.source.postMessage( {bounds: [[sw.lat().toFixed(6), sw.lng().toFixed(6)], [ne.lat().toFixed(6), ne.lng().toFixed(6)]], center: [center.lat().toFixed(6), center.lng().toFixed(6)], zoom: ingr.getZoom()}, target );
+    event.source.postMessage({
+		bounds: [
+			[sw.lat().toFixed(6), sw.lng().toFixed(6)],
+			[ne.lat().toFixed(6), ne.lng().toFixed(6)]
+		],
+		center: [center.lat().toFixed(6), center.lng().toFixed(6)],
+		zoom: ingr.getZoom()
+	}, target );
     sw = ne = center = bounds = null;
     return true;
   }
