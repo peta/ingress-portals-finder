@@ -359,7 +359,7 @@ window.addEventListener('message', function(event){
   }
 });
 
-function initialize() {
+function initialize(zoom) {
    if( !window.google || !window.google.maps ) {
      _ob('mindon_ingr_map').appendChild( _ob('retry') );
      _ob('retry').style.display = '';
@@ -368,7 +368,7 @@ function initialize() {
    try{
    var mapOptions = {
      center: new google.maps.LatLng(lat, lng),
-     zoom: 12,
+     zoom: zoom || 16,
      mapTypeId: google.maps.MapTypeId.HYBRID
    };
    ingr = new google.maps.Map(_ob("mindon_ingr_map"),
