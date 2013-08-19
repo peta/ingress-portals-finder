@@ -1,18 +1,16 @@
 var ck = document.cookie.match(/(^|;)\s*csrftoken=([^\s;]+)/i)
   , token = ck && ck[2] || ''
-  , api = "//www.ingress.com/rpc/dashboard.getThinnedEntitiesV3"
+  , api = "//www.ingress.com/rpc/dashboard.getThinnedEntitiesV4"
   , qk = '0_2_6'
   , param = {
-    "zoom" : 16,
     "boundsParamsList" : [],
-    "method": "dashboard.getThinnedEntitiesV3"
+    "method": "dashboard.getThinnedEntitiesV4"
   };
 
 var port = chrome.extension.connect({name: "ingress-air"})
   , ready = true;
 
 port.onMessage.addListener(function(bounds){
-	console.log('[Fix] ingr.js message received', bounds);
   ready = true;
   if( /-?[\.\d]+,-?[\.\d]+,-?[\.\d]+,-?[\.\d]+@\d+/.test( bounds ) ) {
     if( !token ) {
@@ -110,7 +108,8 @@ xhr.onreadystatechange = function(){
 	// Instead of a single tile data object, since V3 we may have multiple ones.
 	// So we simply merge all entities into a single array
 	
-	var tileDataObjs = [],
+	var gameEntities = [],
+		delEntities = [],
 		tileId,
 		tileObj,
 		nEntities;
@@ -119,17 +118,20 @@ xhr.onreadystatechange = function(){
 		tileObj = resp.result.map[tileId];
 		if (tileObj.gameEntities) {			
 			nEntities = tileObj.gameEntities.length;
-			tileDataObjs = tileDataObjs.concat(tileObj.gameEntities);
+			gameEntities = gameEntities.concat(tileObj.gameEntities);
 		} else {
 			nEntities = 'no';
+		}
+		if (tileObj.deletedGameEntityGuids && tileObj.deletedGameEntityGuids.length) {
+			delEntities = delEntities.concat(tileObj.deletedGameEntityGuids);
 		}
 		console.log('[Fix] Found '+nEntities+' game entities in tile "'+tileId+'"');
 	}
 	
-	console.log('[Fix] Found game entities: ', tileDataObjs);
+	console.log('[Fix] Found '+gameEntities.length+' game entities in total', gameEntities);
     port.postMessage({
-    	deletedGameEntityGuids: [],
-		gameEntities: tileDataObjs
+    	deletedGameEntityGuids: delEntities,
+		gameEntities: gameEntities
     });
   }
 };
