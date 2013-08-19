@@ -144,7 +144,7 @@ function csv(img, level) {
   if( !isNaN(level) ) 
     n = [level];
 
-  var v = $('#mykey').val();
+  var v = $('#mykeywords').val();
   if( /\S/.test(v) ) {
     krxp = new RegExp( '(' +v.replace(/^\s+|\s+$/g,'').toLowerCase().replace(/\s*,\s*/g, '|') +')', 'ig' );
   }
@@ -206,7 +206,7 @@ function gpx(img, level) {
   if( !isNaN(level)) 
     n = [level];
 
-  var v = $('#mykey').val();
+  var v = $('#mykeywords').val();
   if( /\S/.test(v) ) {
     krxp = new RegExp( '(' +v.replace(/^\s+|\s+$/g,'').toLowerCase().replace(/\s*,\s*/g, '|') +')', 'ig' );
   }
